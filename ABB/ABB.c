@@ -2,11 +2,11 @@
 #include <stdlib.h>
 //#include "fila_abb.h"
 
-struct tree {
+typedef struct tree {
     int info;
     struct tree *esq;
     struct tree *dir;
-};
+} Tree;
 
 /*
 void insere(struct tree **raiz, int info)
@@ -44,6 +44,36 @@ void insere(struct tree **no, int info)
         else
             insereRecursivo (&(*no)->dir, info);
     }
+}
+
+void buscaRecursiva(struct tree *raiz, int info, struct tree **aux)
+{
+    if (raiz != NULL)
+    {
+        if (info == raiz->info)
+            *aux = raiz;
+        else
+            if (info < raiz->info)
+                buscaRecursiva(raiz->esq, info, &*aux);
+            else
+                buscaRecursiva(raiz->esq, info, &*aux);
+    }
+    else
+        *aux = NULL;
+}
+
+
+////////////////////////////////////////// BUSCA ITERATIVA
+void busca(struct tree *raiz, int info, struct tree **aux)
+{
+    while (raiz != NULL && info != raiz->info)
+    {
+        if (info < raiz->esq)
+            raiz = raiz->esq;
+        else
+            raiz = raiz->dir;
+    }
+    *aux = raiz;
 }
 
 void balanceamento(struct tree **raiz)
