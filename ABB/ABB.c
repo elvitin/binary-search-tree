@@ -14,7 +14,6 @@ void insere(struct tree **raiz, int info)
     if (*raiz == NULL)
         *raiz = criaNo(info);
     else {
-
         if ((*raiz)->info < info)
         {
             if ((*raiz)->dir == NULL)
@@ -74,6 +73,31 @@ void busca(struct tree *raiz, int info, struct tree **aux)
             raiz = raiz->dir;
     }
     *aux = raiz;
+}
+
+//exclusao(&*raiz, e, pai, 'e');
+
+void exclusao (Tree **raiz, Tree *e, Tree *pai, char lado)
+{
+	
+	if (e->esq == NULL && e->dir == NULL) //e->esq == e->dir
+	{
+		
+	}
+	else if (e->esq == NULL || e->dir == NULL)
+	{
+		
+	} else {
+		
+		if (lado == 'e')
+		{
+			
+		}
+		else
+		{
+			
+		}
+	}
 }
 
 void balanceamento(struct tree **raiz)
