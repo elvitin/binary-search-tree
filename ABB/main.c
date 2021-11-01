@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include "fila_abb.h"
+#include <stdbool.h>
+
+//#define COUNT 10
 
 typedef struct tree
 {
@@ -9,36 +11,43 @@ typedef struct tree
 	struct tree *dir;
 } Tree;
 
-/*
-void insere(struct tree **raiz, int info)
-{
-    if (*raiz == NULL)
-        *raiz = criaNo(info);
-    else {
-        if ((*raiz)->info < info)
-        {
-            if ((*raiz)->dir == NULL)
-                (*raiz)->dir = criaNo(info);
-            else
-                insere(&(*raiz)->dir, info);
-        }
-        else
-        {
-            if ((*raiz)->esq == NULL)
-                (*raiz)->esq = criaNo(info);
-            else
-                insere(&(*raiz)->esq, info);
-        }
-    }
-}
-*/
+#include "fila_abb.h"
 
-struct no *novoNo (int info)
+void gotoxy(int x, int y)
 {
-    Tree *no = (Tree *) malloc (sizeof (Tree));
-    no->esq = no->dir = NULL;
-    no->info = info;
-    return no;
+	printf("%c[%d;%df", 0x1B, y, x);
+}
+
+void exibe(Tree *raiz, int x, int y, int dist)
+{
+	system("clear");
+	if (raiz != NULL)
+	{
+		gotoxy(x, y);
+		printf("%d ", raiz->info);
+
+		if (raiz->esq != NULL)
+		{
+			gotoxy(x - dist / 2, y + 1);
+			printf("/");
+		}
+		if (raiz->dir != NULL)
+		{
+			gotoxy(x + dist / 2, y + 1);
+			printf("\\");
+		}
+
+		exibe(raiz->esq, x - dist, y + 2, dist / 2);
+		exibe(raiz->dir, x + dist, y + 2, dist / 2);
+	}
+}
+
+Tree *novoNo(int info)
+{
+	Tree *no = (Tree *)malloc(sizeof(Tree));
+	no->esq = no->dir = NULL;
+	no->info = info;
+	return no;
 }
 
 void insere(struct tree **no, int info)
@@ -48,9 +57,9 @@ void insere(struct tree **no, int info)
 	else
 	{
 		if (info < (*no)->info)
-			insereRecursivo(&(*no)->esq, info);
+			insere(&(*no)->esq, info);
 		else
-			insereRecursivo(&(*no)->dir, info);
+			insere(&(*no)->dir, info);
 	}
 }
 
@@ -76,7 +85,7 @@ void busca(struct tree *raiz, int info, Tree **e, Tree **pai)
 	while (raiz != NULL && info != raiz->info)
 	{
 		*pai = raiz;
-		if (info < raiz->esq)
+		if (info < raiz->info)
 			raiz = raiz->esq;
 		else
 			raiz = raiz->dir;
@@ -85,7 +94,6 @@ void busca(struct tree *raiz, int info, Tree **e, Tree **pai)
 }
 
 //exclusao(&*raiz, e, pai, 'e');
-
 void exclusao(Tree **raiz, Tree *e, Tree *pai, char lado)
 {
 	if (e->esq == NULL && e->dir == NULL) //e->esq == e->dir
@@ -105,14 +113,14 @@ void exclusao(Tree **raiz, Tree *e, Tree *pai, char lado)
 	{
 		if (e != pai)
 		{
-			if (e->info < pai->info) 
+			if (e->info < pai->info)
 			{
 				if (e->esq != NULL)
 					pai->esq = e->esq;
 				else
 					pai->esq = e->dir;
-			}	
-			else 
+			}
+			else
 			{
 				if (e->esq != NULL)
 					pai->dir = e->esq;
@@ -137,7 +145,7 @@ void exclusao(Tree **raiz, Tree *e, Tree *pai, char lado)
 
 		if (lado == 'e')
 		{
-			sub    = e->esq;
+			sub = e->esq;
 			subPai = e;
 
 			while (sub->dir != NULL)
@@ -148,7 +156,7 @@ void exclusao(Tree **raiz, Tree *e, Tree *pai, char lado)
 		}
 		else
 		{
-			sub    = e->dir;
+			sub = e->dir;
 			subPai = e;
 
 			while (sub->esq != NULL)
@@ -164,6 +172,17 @@ void exclusao(Tree **raiz, Tree *e, Tree *pai, char lado)
 	}
 }
 
+//quantNo(no->dir, &qdir)
+void quantNo(Tree *no, int *qtde)
+{
+	if (no != NULL)
+	{
+		(*qtde)++;
+		quantNo(no->esq, qtde);
+		quantNo(no->dir, qtde);
+	}
+}
+
 void balanceamento(struct tree **raiz)
 {
 	struct tree *no;
@@ -175,12 +194,15 @@ void balanceamento(struct tree **raiz)
 	int qesq;
 	int fb;
 
-	struct fila *f;
+	Fila f;
+
 	init(&f);
-	enqueue(&f, *raiz);
+
+	enQueue(&f, *raiz);
+
 	while (!isEmpty(f))
 	{
-		dequeue(&f, &no);
+		deQueue(&f, &no);
 
 		do
 		{
@@ -208,18 +230,46 @@ void balanceamento(struct tree **raiz)
 				insere(&*raiz, aux);
 			}
 		} while (abs(fb) > 1);
+
+		if (no->esq != NULL)
+			enQueue(&f, no->esq);
+
+		if (no->dir != NULL)
+			enQueue(&f, no->dir);
 	}
-
-
-	if (no->esq != NULL)
-		enqueue(&f, no->esq);
-
-	if (no->dir != NULL)
-		enqueue(&f, no->dir);
 }
 
 int main()
 {
+	Tree *abb = NULL;
+
+	insere(&abb, 80);
+	insere(&abb, 200);
+	insere(&abb, 70);
+	insere(&abb, 180);
+	insere(&abb, 60);
+	insere(&abb, 130);
+	insere(&abb, 110);
+	insere(&abb, 10);
+	insere(&abb, 170);
+	insere(&abb, 30);
+	insere(&abb, 100);
+	insere(&abb, 190);
+	insere(&abb, 50);
+	insere(&abb, 140);
+	insere(&abb, 90);
+	insere(&abb, 160);
+	insere(&abb, 120);
+	insere(&abb, 150);
+
+	exibe(abb, 80, 1, 35);
+	getc(stdin);
+
+	balanceamento(&abb);
+
+	exibe(abb, 80, 1, 20);
+	putchar('\n');
+	//system("clear");
 
 	return 0;
 }

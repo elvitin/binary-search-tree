@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+lab
+ABB/output
+lab1.c
+lab.c
